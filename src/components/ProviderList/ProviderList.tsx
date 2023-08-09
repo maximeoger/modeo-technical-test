@@ -1,14 +1,7 @@
-import { useCubeQuery } from "@cubejs-client/react";
+import {useQueriesContext} from "../../helpers/state";
 
 const ProviderList = () => {
-  const { resultSet, isLoading, error, progress } = useCubeQuery({
-    "dimensions": [
-      "datamart_daily_user_activities.provider"
-    ],
-    "order": {
-      "datamart_daily_user_activities.activities": "desc"
-    }
-  });
+  const { providers : { resultSet, isLoading, error, progress } } = useQueriesContext()
 
   if (isLoading) {
     return (
@@ -22,22 +15,18 @@ const ProviderList = () => {
     return <div>{error.toString()}</div>;
   }
 
-  if (!resultSet) {
-    return null;
-  }
-
-  const data = resultSet.pivot()
-
-  console.log(data)
-
   return (
-   <>
-     {
-       data.map((data, i) => (
-         <p key={i}>{data.xValues[0]}</p>
-       ))
-     }
-   </>
+    <div>
+      <ul className="mt-6">
+        {
+          resultSet && resultSet.pivot().map((dataSet, i) => (
+            <li className="font-light mt-1 text-medium" key={`${i}-${dataSet.xValues[0]}`}>
+              {dataSet.xValues[0]}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   )
 }
 
